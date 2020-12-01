@@ -202,7 +202,8 @@ let day1Input = """1211
 type SumExpression = SumExpression of int * int * int
 type TripleSumExpression = TripleSumExpression of int * int * int * int
 
-let parseInput (x: string) = x.Split([| '\n' |]) |> Array.toList
+let parseInput (x: string) =
+    x.Split([| '\n' |]) |> Set.ofArray |> Set.map int
 
 let generateSums ns =
     seq {
@@ -228,17 +229,25 @@ let generateTripleSums ns =
                 }
     }
 
-let day1Part1 =
-    let numbers = parseInput day1Input |> List.map int
-    generateSums numbers
+let day1Part1Solution =
+    parseInput day1Input
+    |> generateSums
     |> Seq.tryFind (fun exp ->
         match exp with
         | SumExpression (_, _, res) -> res = 2020)
 
-let day1Part2 =
+let day1Part2Solution =
     parseInput day1Input
-    |> List.map int
     |> generateTripleSums
     |> Seq.tryFind (fun exp ->
         match exp with
         | TripleSumExpression (_, _, _, res) -> res = 2020)
+
+match day1Part1Solution with
+| Some (SumExpression (a, b, sum)) -> printfn "%i + %i = %i, %i * %i = %i" a b sum a b (a * b)
+| None -> do printfn "Part1: Not found."
+
+match day1Part2Solution with
+| Some (TripleSumExpression (a, b, c, sum)) ->
+    printfn "%i + %i + %i = %i, %i * %i * %i = %i" a b c sum a b c (a * b * c)
+| None -> do printfn "Part2: Not found."
