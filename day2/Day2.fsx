@@ -25,11 +25,11 @@ module PasswordPolicy =
 
         (occurences >= min) && (occurences <= max)
 
-    let private fromElivshIndex i = i - 1
+    let private fromElvishIndex i = i - 1
 
     let isValidPasswordPolicyAccordingToPart2 { Min = min; Max = max; Password = password; Letter = letter } =
-        let pos1 = password.[fromElivshIndex min]
-        let pos2 = password.[fromElivshIndex max]
+        let pos1 = password.[fromElvishIndex min]
+        let pos2 = password.[fromElvishIndex max]
 
         (letter = pos1 && letter <> pos2)
         || (letter <> pos1 && letter = pos2)
