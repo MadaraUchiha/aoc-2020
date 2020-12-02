@@ -57,6 +57,6 @@ printfn
 
 
 printfn
-    "Day 2, part 1: There are %i valid passwords out of %i total."
+    "Day 2, part 2: There are %i valid passwords out of %i total."
     day2Part2Solution
     (parseInput day2Input |> List.length)
