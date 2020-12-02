@@ -21,9 +21,9 @@ module PasswordPolicy =
           Password = password }
 
     let isValidPasswordPolicyAccordingToPart1 { Min = min; Max = max; Password = password; Letter = letter } =
-        let occurences = countMatches (letter |> string) password
+        let occurrences = countMatches (letter |> string) password
 
-        (occurences >= min) && (occurences <= max)
+        (occurrences >= min) && (occurrences <= max)
 
     let private fromElvishIndex i = i - 1
 
