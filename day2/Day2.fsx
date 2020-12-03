@@ -7,6 +7,9 @@ open Day2Input
 let countMatches needle haystack =
     Regex.Matches(haystack, Regex.Escape needle).Count
 
+/// XOR
+let (^^) a b = a <> b
+
 module PasswordPolicy =
     type PasswordPolicy =
         { Min: int
@@ -31,8 +34,7 @@ module PasswordPolicy =
         let pos1 = password.[fromElvishIndex min]
         let pos2 = password.[fromElvishIndex max]
 
-        (letter = pos1 && letter <> pos2)
-        || (letter <> pos1 && letter = pos2)
+        (letter = pos1) ^^ (letter = pos2)
 
 
 let parseInput (input: string) =
