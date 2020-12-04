@@ -82,28 +82,22 @@ let emptyPassport =
       pid = None
       cid = None }
 
-let isPassportPart1Valid { byr = byr; iyr = iyr; eyr = eyr; hgt = hgt; hcl = hcl; ecl = ecl; pid = pid } =
-    Option.isSome byr
-    && Option.isSome iyr
-    && Option.isSome eyr
-    && Option.isSome hgt
-    && Option.isSome hcl
-    && Option.isSome ecl
-    && Option.isSome pid
+let isPassportPart1Valid passport =
+    match passport with
+    | { byr = Some _; iyr = Some _; eyr = Some _; hgt = Some _; hcl = Some _; ecl = Some _; pid = Some _ } -> true
+    | _ -> false
 
 let isPassportPart2Valid passport =
-    if (not (isPassportPart1Valid passport)) then
-        false
-    else
-        let { byr = byr; iyr = iyr; eyr = eyr; hgt = hgt; hcl = hcl; ecl = ecl; pid = pid } = passport
-
-        Year.valid 1920 2002 (Option.get byr)
-        && Year.valid 2010 2020 (Option.get iyr)
-        && Year.valid 2020 2030 (Option.get eyr)
-        && Height.valid (Option.get hgt)
-        && Color.valid (Option.get hcl)
-        && EyeColor.valid (Option.get ecl)
-        && PassportId.valid (Option.get pid)
+    match passport with
+    | { byr = Some byr; iyr = Some iyr; eyr = Some eyr; hgt = Some hgt; hcl = Some hcl; ecl = Some ecl; pid = Some pid } ->
+        Year.valid 1920 2002 byr
+        && Year.valid 2010 2020 iyr
+        && Year.valid 2020 2030 eyr
+        && Height.valid hgt
+        && Color.valid hcl
+        && EyeColor.valid ecl
+        && PassportId.valid pid
+    | _ -> false
 
 let passportEntryOfString passport (str: string) =
     let keyValue = str.Trim().Split(':')
