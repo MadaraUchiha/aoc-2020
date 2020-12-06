@@ -1,8 +1,9 @@
-open System
 open System.Text.RegularExpressions
 
+#load "../common/Utils.fsx"
 #load "Day4Input.fsx"
 open Day4Input
+open Utils
 
 module Year =
     type T = Year of int
@@ -129,14 +130,13 @@ let passportEntryOfString passport (str: string) =
         | key -> failwith (sprintf "Invalid key: %s." key)
     | _ -> failwith (sprintf "Invalid input. Line: %s" str)
 
-let passportOfString (str: string) =
-    str.Trim().Split([| '\n'; ' ' |], StringSplitOptions.None)
-    |> Array.fold passportEntryOfString emptyPassport
+let passportOfString str =
+    str
+    |> splitMany [ "\n"; " " ]
+    |> List.fold passportEntryOfString emptyPassport
 
-let parseInput (input: string) =
-    input.Trim().Split([| "\n\n" |], StringSplitOptions.None)
-    |> List.ofArray
-    |> List.map passportOfString
+let parseInput input =
+    input |> split "\n\n" |> List.map passportOfString
 
 let day4Part1Solution =
     parseInput day4Input

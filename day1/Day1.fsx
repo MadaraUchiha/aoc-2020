@@ -1,11 +1,13 @@
 #load "Day1Input.fsx"
+#load "../common/Utils.fsx"
 open Day1Input
+open Utils
 
 type SumExpression = int * int * int
 type TripleSumExpression = int * int * int * int
 
-let parseInput (x: string) =
-    x.Split([| '\n' |]) |> Set.ofArray |> Set.map int
+let parseInput input =
+    input |> split "\n" |> Set.ofList |> Set.map int
 
 let generateSums ns =
     seq {

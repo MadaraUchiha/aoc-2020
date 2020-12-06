@@ -1,13 +1,7 @@
 #load "Day3Input.fsx"
+#load "../common/Utils.fsx"
 open Day3Input
-
-// Utility
-module Array =
-    let filteri predicate values =
-        values
-        |> Array.indexed
-        |> Array.filter (fun (i, value) -> predicate i value)
-        |> Array.map snd
+open Utils
 
 module Tile =
     type Tile =
@@ -21,9 +15,8 @@ module Tile =
 
     let rowFromString s = Array.ofSeq s |> Array.map tileFromChar
 
-let parseInput (input: string) =
-    input.Split([| '\n' |])
-    |> Array.map ((fun r -> r.Trim()) >> Tile.rowFromString)
+let parseInput input =
+    input |> split "\n" |> List.map Tile.rowFromString
 
 type Vector = { x: int; y: int }
 
@@ -32,10 +25,10 @@ let tileAtIndex<'T> (row: 'T []) index = row.[index % Array.length row]
 
 let solveFor { x = advanceX; y = advanceY } tiles =
     tiles
-    |> Array.filteri (fun i _ -> i % advanceY = 0)
-    |> Array.mapi (fun i row -> tileAtIndex row (i * advanceX))
-    |> Array.filter (fun t -> t = Tile.Tree)
-    |> Array.length
+    |> List.filteri (fun i _ -> i % advanceY = 0)
+    |> List.mapi (fun i row -> tileAtIndex row (i * advanceX))
+    |> List.filter (fun t -> t = Tile.Tree)
+    |> List.length
 
 let tiles = parseInput day3Input
 

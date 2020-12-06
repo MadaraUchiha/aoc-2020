@@ -3,9 +3,8 @@ open System
 #load "Day6Input.fsx"
 open Day6Input
 
-let split (substr: string) (str: string) =
-    str.Split([| substr |], StringSplitOptions.None)
-    |> List.ofArray
+#load "../common/utils.fsx"
+open Utils
 
 let parseInput input =
     input

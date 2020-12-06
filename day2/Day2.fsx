@@ -1,8 +1,10 @@
+#load "../common/Utils.fsx"
 #load "Day2Input.fsx"
 #r "nuget: FSharpPlus"
 open FSharpPlus
 open System.Text.RegularExpressions
 open Day2Input
+open Utils
 
 let countMatches needle haystack =
     Regex.Matches(haystack, Regex.Escape needle).Count
@@ -37,9 +39,9 @@ module PasswordPolicy =
         (letter = pos1) ^^ (letter = pos2)
 
 
-let parseInput (input: string) =
-    input.Split([| '\n' |])
-    |> List.ofArray
+let parseInput input =
+    input
+    |> split "\n"
     |> List.map (PasswordPolicy.ofTuple << (sscanf "%i-%i %c: %s"))
 
 let day2Part1Solution =
