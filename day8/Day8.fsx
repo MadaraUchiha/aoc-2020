@@ -49,7 +49,9 @@ let day8Part1Solution =
 
 let updateElement f key st =
     st
-    |> List.map (fun (k, v) -> if k = key then k, f v else k, v)
+    |> List.map (function
+        | (k, v) when k = key -> k, f v
+        | e -> e)
 
 let switcheroo instruction =
     match instruction with
