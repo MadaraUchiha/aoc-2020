@@ -7,6 +7,9 @@ let splitMany (substrs: string seq) (str: string) =
 
 let split substr str = splitMany [ substr ] str
 
+let trimEnd (c: char) (str: string) = str.TrimEnd(c)
+let trim (str: string) = str.Trim()
+
 module List =
     let filteri predicate values =
         values
