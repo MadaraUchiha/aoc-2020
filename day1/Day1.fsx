@@ -13,8 +13,9 @@ let findTripletsSummingTo n set =
     |> Seq.map (fun a -> (a, findPairSummingTo (n - a) set))
     |> Seq.tryFind (snd >> Option.isSome)
     |> Option.map (function
-        | a, Some (b, c) -> (a, b, c)
-        | _ -> failwith "Won't be reached")
+        | a, Some (b, c) -> Some(a, b, c)
+        | _ -> None)
+    |> Option.flatten
 
 let parseInput input =
     input |> split "\n" |> Set.ofList |> Set.map int
