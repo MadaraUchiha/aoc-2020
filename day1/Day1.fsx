@@ -3,50 +3,32 @@
 open Day1Input
 open Utils
 
-type SumExpression = int * int * int
-type TripleSumExpression = int * int * int * int
+let findPairSummingTo n set =
+    set
+    |> Seq.tryFind (fun a -> set |> Set.contains (n - a))
+    |> Option.map (fun a -> (a, n - a))
+
+let findTripletsSummingTo n set =
+    set
+    |> Seq.map (fun a -> (a, findPairSummingTo (n - a) set))
+    |> Seq.tryFind (snd >> Option.isSome)
+    |> Option.map (function
+        | a, Some (b, c) -> (a, b, c)
+        | _ -> failwith "Won't be reached")
 
 let parseInput input =
     input |> split "\n" |> Set.ofList |> Set.map int
 
-let generateSums ns =
-    seq {
-        for a in ns do
-            yield!
-                seq {
-                    for b in ns do
-                        yield SumExpression(a, b, a + b)
-                }
-    }
-
-let generateTripleSums ns =
-    seq {
-        for a in ns do
-            yield!
-                seq {
-                    for b in ns do
-                        yield!
-                            seq {
-                                for c in ns do
-                                    yield TripleSumExpression(a, b, c, a + b + c)
-                            }
-                }
-    }
-
 let day1Part1Solution =
-    parseInput day1Input
-    |> generateSums
-    |> Seq.tryFind (fun (_, _, res) -> res = 2020)
+    parseInput day1Input |> findPairSummingTo 2020
 
 let day1Part2Solution =
-    parseInput day1Input
-    |> generateTripleSums
-    |> Seq.tryFind (fun (_, _, _, res) -> res = 2020)
+    parseInput day1Input |> findTripletsSummingTo 2020
 
 match day1Part1Solution with
-| Some (a, b, sum) -> printfn "%i + %i = %i, %i * %i = %i" a b sum a b (a * b)
+| Some (a, b) -> printfn "%i + %i = %i, %i * %i = %i" a b (a + b) a b (a * b)
 | None -> do printfn "Part1: Not found."
 
 match day1Part2Solution with
-| Some (a, b, c, sum) -> printfn "%i + %i + %i = %i, %i * %i * %i = %i" a b c sum a b c (a * b * c)
+| Some (a, b, c) -> printfn "%i + %i + %i = %i, %i * %i * %i = %i" a b c (a + b + c) a b c (a * b * c)
 | None -> do printfn "Part2: Not found."
