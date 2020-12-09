@@ -56,10 +56,6 @@ let findEventuallyContaining bag parentalMapping =
 
     folder parentalMapping bag |> Set.remove bag
 
-let parseInput input =
-    input
-    |> split "\n"
-    |> Seq.map ((trimEnd '.') >> parseBagContains)
 
 let totalBagsContainedIn color list =
     let containingMapping =
@@ -77,6 +73,11 @@ let totalBagsContainedIn color list =
     (sum color) - 1
 
 let myBag = BagColor "shiny gold"
+
+let parseInput input =
+    input
+    |> split "\n"
+    |> Seq.map ((trimEnd '.') >> parseBagContains)
 
 let day7Part1Solution =
     parseInput day7Input
