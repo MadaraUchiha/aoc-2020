@@ -17,6 +17,9 @@ module List =
         |> List.filter (fun (i, value) -> predicate i value)
         |> List.map snd
 
+module Seq =
+    let mapSnd fn = Seq.map (fun (a, b) -> (a, fn b))
+
 module RegExp =
     let replace (pattern: string) (replacement: string) (source: string) =
         Regex.Replace(source, pattern, replacement)
