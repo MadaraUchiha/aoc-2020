@@ -42,8 +42,7 @@ let rec toFirstFound fn (x, y) tile (map: GameMap) =
 let findInLineOfSight predicate tile map =
     directions
     |> Seq.map (fun vector -> toFirstFound predicate vector tile map)
-    |> Seq.filter Option.isSome
-    |> Seq.map Option.get
+    |> Seq.choose id
 
 let findAdjacent = findInLineOfSight (fun _ -> true)
 
