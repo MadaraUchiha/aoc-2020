@@ -1,5 +1,9 @@
+#r "nuget: FSharpPlus"
+
 open System
 open System.Text.RegularExpressions
+open FSharpPlus
+
 
 let splitMany (substrs: string seq) (str: string) =
     str.Split(substrs |> Array.ofSeq, StringSplitOptions.None)
@@ -29,6 +33,8 @@ module RegExp =
         if m.Success
         then Some(List.tail [ for g in m.Groups -> g.Value ])
         else None
+
+let inline (|Scan|_|) pattern input = trySscanf pattern input
 
 let inline (%%) x m =
     let mod' = x % m
