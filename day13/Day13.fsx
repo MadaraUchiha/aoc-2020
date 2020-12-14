@@ -32,11 +32,6 @@ let parseInput input =
              | id -> Id(int id)))
     | _ -> failwith "Invalid input"
 
-let rec toFirstPositive n modu =
-    if n = modu then 0L
-    else if n >= 0L then n
-    else toFirstPositive (n + modu) modu
-
 let day13Part1Solution =
     parseInput day13Input ||> findClosestBus ||> (*)
 
@@ -45,7 +40,7 @@ let day13Part2Solution =
     |> snd
     |> List.indexed
     |> List.choose (function
-        | i, Id x -> Some(toFirstPositive (int64 -i) (int64 x), int64 x)
+        | i, Id x -> Some((int64 -i) %% (int64 x), int64 x)
         | _ -> None)
     |> chineseRemainderTheorem
 

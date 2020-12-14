@@ -35,7 +35,7 @@ let vector direction =
     | n -> failwith (sprintf "Will never arrive: %A" n)
 
 let fakeSin n =
-    match (n + 360) % 360 with
+    match n %% 360 with
     | 0 -> 0
     | 90 -> 1
     | 180 -> 0
@@ -43,7 +43,7 @@ let fakeSin n =
     | _ -> failwith "Invalid fakeSin"
 
 let fakeCos n =
-    match (n + 360) % 360 with
+    match n %% 360 with
     | 0 -> 1
     | 90 -> 0
     | 180 -> -1
@@ -66,8 +66,8 @@ let turn (direction: Direction) action =
     let offset n = n / 90
 
     match action with
-    | L n -> enum<Direction> ((intDirection + offset n + 4) % 4)
-    | R n -> enum<Direction> ((intDirection - offset n + 4) % 4)
+    | L n -> enum<Direction> ((intDirection + offset n) %% 4)
+    | R n -> enum<Direction> ((intDirection - offset n) %% 4)
     | _ -> failwith "Will never arrive"
 
 let takeStep ship action =

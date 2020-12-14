@@ -29,3 +29,7 @@ module RegExp =
         if m.Success
         then Some(List.tail [ for g in m.Groups -> g.Value ])
         else None
+
+let inline (%%) x m =
+    let mod' = x % m
+    if sign mod' > 0 then mod' else abs (mod' + m)
