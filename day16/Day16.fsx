@@ -43,12 +43,13 @@ let parseInput input =
 
 let inRange min max n = (n >= min) && (n <= max)
 
+let inEitherRange range1 range2 n =
+    (range1 ||> inRange) n || (range2 ||> inRange) n
+
 let isInvalid fields n =
     fields
     |> List.map (fun field -> field.Range)
-    |> List.forall (fun ((minA, maxA), (minB, maxB)) ->
-        (not (inRange minA maxA n))
-        && (not (inRange minB maxB n)))
+    |> List.forall (fun ranges -> not (n |> (inEitherRange <|| ranges)))
 
 let findInvalidFields fields (ticket: Ticket) =
     let fieldInvalid = isInvalid fields
@@ -56,21 +57,16 @@ let findInvalidFields fields (ticket: Ticket) =
 
 let eliminateInvalidTickets fields tickets =
     tickets
-    |> List.filter (fun ticket -> ticket |> findInvalidFields fields |> List.isEmpty)
+    |> List.filter (findInvalidFields fields >> List.isEmpty)
 
 let getTicketColumn (tickets: Ticket list) i = tickets |> List.map (fun t -> t.[i])
 
 let findPotentialFieldsForColumn fields col =
     fields
-    |> List.filter (fun field ->
-        col
-        |> List.forall (fun n ->
-            let (minA, maxA), (minB, maxB) = field.Range
+    |> List.filter (fun field -> col |> List.forall (inEitherRange <|| field.Range))
 
-            (inRange minA maxA n) || (inRange minB maxB n)))
-
-let playEliminations (columnMapping: (int * Field list) list) =
-    let rec eliminate (acc: Map<int, Field>) (subMapping: (int * Field list) list) =
+let playEliminations columnMapping =
+    let rec eliminate acc subMapping =
         match subMapping with
         | [] -> acc
         | (index, [ field ]) :: tail ->
@@ -92,7 +88,7 @@ let day16Part1Solution =
     let (fields, _, nearby) = parseInput day16Input
 
     nearby
-    |> List.sumBy (fun ticket -> findInvalidFields fields ticket |> List.sum)
+    |> List.sumBy (findInvalidFields fields >> List.sum)
 
 let day16Part2Solution =
     let (fields, mine, nearby) = parseInput day16Input
@@ -100,17 +96,19 @@ let day16Part2Solution =
     let validTickets = eliminateInvalidTickets fields nearby
 
     let getColumnByIndex = getTicketColumn validTickets
-    [ 0 .. (List.length fields) - 1 ] // for each column
-    |> List.map
-        (getColumnByIndex
-         >> findPotentialFieldsForColumn fields) // find potential matches
-    |> List.indexed // remember the original indices
-    |> List.sortBy (snd >> List.length) // sort by number of potential fields
+    let findMatchingFields = findPotentialFieldsForColumn fields
+    let getMyFieldByIndex i = mine.[i]
+
+    seq [ 0 .. (List.length fields) - 1 ] // for each column
+    |> Seq.map (getColumnByIndex >> findMatchingFields) // find potential matches
+    |> Seq.indexed // remember the original indices
+    |> Seq.sortBy (snd >> List.length) // sort by number of potential fields
+    |> Seq.toList
     |> playEliminations // Magic~~
     |> Map.filter (fun _ field -> field.Name.StartsWith("departure"))
-    |> Map.toList
-    |> List.map (fst >> (fun i -> mine.[i]) >> int64)
-    |> List.reduce (*)
+    |> Map.toSeq
+    |> Seq.map (fst >> getMyFieldByIndex >> int64)
+    |> Seq.reduce (*)
 
 printfn "Day 16 part 1 solution: %i" day16Part1Solution
 printfn "Day 16 part 2 solution: %i" day16Part2Solution
