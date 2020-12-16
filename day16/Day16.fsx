@@ -41,7 +41,7 @@ let parseInput input =
 
     | _ -> failwith "Invalid input."
 
-let inline inRange min max n = (n >= min) && (n <= max)
+let inRange min max n = (n >= min) && (n <= max)
 
 let isInvalid fields n =
     fields
@@ -58,7 +58,7 @@ let eliminateInvalidTickets fields tickets =
     tickets
     |> List.filter (fun ticket -> ticket |> findInvalidFields fields |> List.isEmpty)
 
-let getTicketColumn (i: int) (tickets: Ticket list) = tickets |> List.map (fun t -> t.[i])
+let getTicketColumn (tickets: Ticket list) i = tickets |> List.map (fun t -> t.[i])
 
 let findPotentialFieldsForColumn fields col =
     fields
@@ -70,7 +70,7 @@ let findPotentialFieldsForColumn fields col =
             (inRange minA maxA n) || (inRange minB maxB n)))
 
 let playEliminations (columnMapping: (int * Field list) list) =
-    let rec folder (acc: Map<int, Field>) (subMapping: (int * Field list) list) =
+    let rec eliminate (acc: Map<int, Field>) (subMapping: (int * Field list) list) =
         match subMapping with
         | [] -> acc
         | (index, [ field ]) :: tail ->
@@ -81,16 +81,15 @@ let playEliminations (columnMapping: (int * Field list) list) =
                 |> Seq.mapSnd (List.filter ((<>) field))
                 |> List.ofSeq
 
-            folder mapWithFound tailWithEliminated
+            eliminate mapWithFound tailWithEliminated
         | _ ->
-            failwith
-                "Assumption failure: It is assumed that the column mapping matches increasing amounts of fields, so that the first element after filtering is always singular."
+            failwith "Assumption failure: It is assumed that the column mapping matches increasing amounts of fields,
+                so that the first element after filtering is always singular."
 
-
-    folder Map.empty columnMapping
+    eliminate Map.empty columnMapping
 
 let day16Part1Solution =
-    let (fields, mine, nearby) = parseInput day16Input
+    let (fields, _, nearby) = parseInput day16Input
 
     nearby
     |> List.sumBy (fun ticket -> findInvalidFields fields ticket |> List.sum)
@@ -99,13 +98,15 @@ let day16Part2Solution =
     let (fields, mine, nearby) = parseInput day16Input
 
     let validTickets = eliminateInvalidTickets fields nearby
-    [ 0 .. (List.length fields) - 1 ]
-    |> List.map (fun i ->
-        let col = getTicketColumn i validTickets
-        findPotentialFieldsForColumn fields col)
-    |> List.indexed
-    |> List.sortBy (snd >> List.length)
-    |> playEliminations
+
+    let getColumnByIndex = getTicketColumn validTickets
+    [ 0 .. (List.length fields) - 1 ] // for each column
+    |> List.map
+        (getColumnByIndex
+         >> findPotentialFieldsForColumn fields) // find potential matches
+    |> List.indexed // remember the original indices
+    |> List.sortBy (snd >> List.length) // sort by number of potential fields
+    |> playEliminations // Magic~~
     |> Map.filter (fun _ field -> field.Name.StartsWith("departure"))
     |> Map.toList
     |> List.map (fst >> (fun i -> mine.[i]) >> int64)
