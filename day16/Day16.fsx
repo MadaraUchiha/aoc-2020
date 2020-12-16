@@ -6,7 +6,7 @@ open Utils
 
 type Field =
     { Name: string
-      Range: (int * int) list }
+      Range: (int * int) * (int * int) }
 
 type Ticket = int list
 
@@ -16,7 +16,7 @@ let parseInput input =
         match line with
         | Scan "%s: %i-%i or %i-%i" (name, minA, maxA, minB, maxB) ->
             { Name = name
-              Range = [ (minA, maxA); (minB, maxB) ] }
+              Range = (minA, maxA), (minB, maxB) }
         | str -> failwithf "Invalid field string: %s" str
 
     let parseTicket line = line |> split "," |> List.map int
@@ -46,9 +46,9 @@ let inline inRange min max n = (n >= min) && (n <= max)
 let isInvalid fields n =
     fields
     |> List.map (fun field -> field.Range)
-    |> List.forall (fun ranges ->
-        ranges
-        |> List.forall (not << (fun (min, max) -> inRange min max n)))
+    |> List.forall (fun ((minA, maxA), (minB, maxB)) ->
+        (not (inRange minA maxA n))
+        && (not (inRange minB maxB n)))
 
 let findInvalidFields fields (ticket: Ticket) =
     let fieldInvalid = isInvalid fields
@@ -65,7 +65,7 @@ let findPotentialFieldsForColumn fields col =
     |> List.filter (fun field ->
         col
         |> List.forall (fun n ->
-            let [ (minA, maxA); (minB, maxB) ] = field.Range
+            let (minA, maxA), (minB, maxB) = field.Range
 
             (inRange minA maxA n) || (inRange minB maxB n)))
 
@@ -95,10 +95,6 @@ let day16Part1Solution =
     nearby
     |> List.sumBy (fun ticket -> findInvalidFields fields ticket |> List.sum)
 
-let inline printid x =
-    printfn "%A" x
-    x
-
 let day16Part2Solution =
     let (fields, mine, nearby) = parseInput day16Input
 
@@ -114,3 +110,6 @@ let day16Part2Solution =
     |> Map.toList
     |> List.map (fst >> (fun i -> mine.[i]) >> int64)
     |> List.reduce (*)
+
+printfn "Day 16 part 1 solution: %i" day16Part1Solution
+printfn "Day 16 part 2 solution: %i" day16Part2Solution
