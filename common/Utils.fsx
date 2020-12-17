@@ -24,6 +24,18 @@ module List =
 module Seq =
     let mapSnd fn = Seq.map (fun (a, b) -> (a, fn b))
 
+module Map =
+    let findOr defaultValue key map =
+        match Map.tryFind key map with
+        | Some x -> x
+        | None -> defaultValue
+
+    let mapKeys fn map =
+        map
+        |> Map.toSeq
+        |> Seq.map (fun (k, v) -> (fn k, v))
+        |> Map.ofSeq
+
 module RegExp =
     let replace (pattern: string) (replacement: string) (source: string) =
         Regex.Replace(source, pattern, replacement)
