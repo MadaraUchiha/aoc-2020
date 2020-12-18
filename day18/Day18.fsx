@@ -6,7 +6,7 @@ open Day18Input
 
 type Value =
     | Number of int
-    | Brackets of string
+    | Formula of string
 
 type Operator =
     | Mul
@@ -20,13 +20,8 @@ type ParserState =
       FormingExpression: string
       CurrentOperator: Operator }
 
-let x =
-    [ Add, Number 1
-      Mul, Number 3
-      Add, Brackets "3 + 4" ]
-
 let parseExpression (exp: string) =
-    let folder acc (c: char) =
+    let folder acc c =
         let sc = string c
         match acc.Braces, sc with
         | n, _ when n < 0 -> failwith "Imbalanced brackets."
@@ -35,7 +30,7 @@ let parseExpression (exp: string) =
                   Braces = 0
                   Result =
                       acc.Result
-                      @ [ (acc.CurrentOperator, Brackets(acc.FormingExpression)) ]
+                      @ [ acc.CurrentOperator, Formula acc.FormingExpression ]
                   FormingExpression = "" }
         | n, "(" when n > 0 ->
             { acc with
@@ -45,12 +40,12 @@ let parseExpression (exp: string) =
             { acc with
                   FormingExpression = acc.FormingExpression + sc
                   Braces = acc.Braces - 1 }
-        | n, c when n > 0 ->
+        | n, _ when n > 0 ->
             { acc with
                   FormingExpression = acc.FormingExpression + sc }
         | _, Scan "%i" i ->
             { acc with
-                  Result = acc.Result @ [ (acc.CurrentOperator, Number i) ] }
+                  Result = acc.Result @ [ acc.CurrentOperator, Number i ] }
         | _, "+" -> { acc with CurrentOperator = Add }
         | _, "*" -> { acc with CurrentOperator = Mul }
         | _, "(" -> { acc with Braces = acc.Braces + 1 }
@@ -58,14 +53,14 @@ let parseExpression (exp: string) =
         | _, " " -> acc
         | _, other -> failwithf "Invalid expression character %s" other
 
+    let initialParserState =
+        { Braces = 0
+          Result = List.empty
+          FormingExpression = ""
+          CurrentOperator = Add }
+
     let result =
-        exp
-        |> Seq.fold
-            (folder)
-               { Braces = 0
-                 Result = List.empty
-                 FormingExpression = ""
-                 CurrentOperator = Add }
+        exp |> Seq.fold folder initialParserState
 
     result.Result
 
@@ -75,12 +70,9 @@ let rec solve expressions =
     |> Seq.fold (fun acc exp ->
         match exp with
         | Add, Number n -> acc + (int64 n)
-        | Add, Brackets s -> acc + (solve (parseExpression s))
+        | Add, Formula s -> acc + (solve (parseExpression s))
         | Mul, Number n -> acc * (int64 n)
-        | Mul, Brackets s -> acc * (solve (parseExpression s))) 0L
-
-let parseInput input =
-    input |> split "\n" |> Seq.map parseExpression
+        | Mul, Formula s -> acc * (solve (parseExpression s))) 0L
 
 let part2ify =
     (RegExp.replace @"\(" "(("
@@ -88,15 +80,18 @@ let part2ify =
      >> RegExp.replace @"\*" ") * (")
     >> (fun s -> "( " + s + " )")
 
-let parseInputPart2 input =
+let parseInputWith mapper input =
     input
     |> split "\n"
-    |> Seq.map (part2ify >> parseExpression)
+    |> Seq.map (mapper >> parseExpression)
 
-let day18Part1Solution = parseInput day18Input |> Seq.sumBy solve
+let day18Part1Solution =
+    day18Input |> parseInputWith id |> Seq.sumBy solve
 
 let day18Part2Solution =
-    parseInputPart2 day18Input |> Seq.sumBy solve
+    day18Input
+    |> parseInputWith part2ify
+    |> Seq.sumBy solve
 
 printfn "Day 18 part 1 solution: %i" day18Part1Solution
 printfn "Day 18 part 2 solution: %i" day18Part2Solution
