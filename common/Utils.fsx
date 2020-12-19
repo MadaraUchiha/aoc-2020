@@ -51,3 +51,7 @@ let inline (|Scan|_|) pattern input = trySscanf pattern input
 let inline (%%) x m =
     let mod' = x % m
     if sign mod' > 0 then mod' else abs (mod' + m)
+
+// Expose outwards
+let inline trySscanf pattern = trySscanf pattern
+let inline sscanf pattern = sscanf pattern
