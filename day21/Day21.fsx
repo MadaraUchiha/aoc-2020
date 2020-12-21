@@ -71,7 +71,7 @@ let playEliminations columnMapping = // day 16 comeback babyyyyyy
             failwith "Assumption failure: It is assumed that the column mapping matches increasing amounts of fields,
                 so that the first element after filtering is always singular."
 
-    eliminate Map.empty columnMapping
+    eliminate Map.empty (Seq.toList columnMapping)
 
 
 let parseInput input =
@@ -97,7 +97,6 @@ let day21Part2Solution =
     |> associateIngredients
     |> Seq.mapSnd Set.toList
     |> Seq.sortBy (snd >> List.length)
-    |> Seq.toList
     |> playEliminations
     |> Map.toSeq
     |> Seq.sortBy fst
