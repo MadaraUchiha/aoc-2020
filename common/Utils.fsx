@@ -22,7 +22,9 @@ module List =
         |> List.map snd
 
 module Seq =
+    let mapFst fn = Seq.map (fun (a, b) -> (fn a, b))
     let mapSnd fn = Seq.map (fun (a, b) -> (a, fn b))
+    let mapBoth fn = Seq.map (fun (a, b) -> (fn a, fn b))
 
 module Map =
     let findOr defaultValue key map =
