@@ -40,9 +40,9 @@ let day13Part2Solution =
     |> snd
     |> List.indexed
     |> List.choose (function
-        | i, Id x -> Some((int64 -i) %% (int64 x), int64 x)
+        | i, Id x -> Some((bigint -i) %% (bigint x), bigint x)
         | _ -> None)
     |> chineseRemainderTheorem
 
 printfn "Day 13 part 1 solution: %i" day13Part1Solution
-printfn "Day 13 part 2 solution: %i" day13Part2Solution
+printfn "Day 13 part 2 solution: %A" day13Part2Solution

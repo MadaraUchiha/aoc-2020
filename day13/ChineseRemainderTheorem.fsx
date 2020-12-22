@@ -1,12 +1,6 @@
-let modularInverse n g =
-    let rec fN n i g e l a =
-        match e with
-        | 0L -> g
-        | _ ->
-            let o = n / e
-            fN e l a (n - o * e) (i - o * l) (g - o * a)
+open System.Numerics
 
-    (n + (fN n 1L 0L g 0L 1L)) % n
+let modInv a m = BigInteger.ModPow(a, m - 2I, m)
 
 let chineseRemainderTheorem equations =
     let product =
@@ -16,7 +10,7 @@ let chineseRemainderTheorem equations =
         equations
         |> Seq.map (fun (a, p) ->
             let n = product / p
-            let inv = modularInverse p n
+            let inv = modInv p n
             (a * n * inv))
         |> Seq.reduce (+)
 
