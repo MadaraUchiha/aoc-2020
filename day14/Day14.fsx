@@ -17,8 +17,6 @@ type Computer =
     { Memory: Map<int64, int64>
       Mask: BitType list }
 
-let charToInt (c: char) = int c - int '0' // lol
-
 let Mask (maskStr: string) =
     maskStr.ToCharArray()
     |> Array.rev

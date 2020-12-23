@@ -14,6 +14,8 @@ let split substr str = splitMany [ substr ] str
 let trimEnd (c: char) (str: string) = str.TrimEnd(c)
 let trim (str: string) = str.Trim()
 
+let charToInt (c: char) = int c - int '0' // lol
+
 module List =
     let filteri predicate values =
         values
@@ -52,7 +54,7 @@ let inline (|Scan|_|) pattern input = trySscanf pattern input
 
 let inline (%%) x m =
     let mod' = x % m
-    if sign mod' > 0 then mod' else abs (mod' + m)
+    if sign mod' >= 0 then mod' else abs (mod' + m)
 
 // Expose outwards
 let inline trySscanf pattern = trySscanf pattern
