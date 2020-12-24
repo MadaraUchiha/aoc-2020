@@ -40,12 +40,16 @@ module Map =
         |> Seq.map (fun (k, v) -> (fn k, v))
         |> Map.ofSeq
 
+    let addUnlessExists key value map =
+        if Map.containsKey key map then map else Map.add key value map
+
 module RegExp =
     let replace (pattern: string) (replacement: string) (source: string) =
         Regex.Replace(source, pattern, replacement)
 
     let (|Pattern|_|) pattern input =
         let m = Regex.Match(input, pattern)
+
         if m.Success
         then Some(List.tail [ for g in m.Groups -> g.Value ])
         else None
